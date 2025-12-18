@@ -704,6 +704,9 @@ def apply_diff_patch(
     elif language == "python":
         patch_str = re.sub(r"# EVOLVE-BLOCK-START\\n", "", patch_str)
         patch_str = re.sub(r"# EVOLVE-BLOCK-END\\n", "", patch_str)
+    elif language == "macaulay2":
+        patch_str = re.sub(r"-- EVOLVE-BLOCK-START\\n", "", patch_str)
+        patch_str = re.sub(r"-- EVOLVE-BLOCK-END\\n", "", patch_str)
     else:
         raise ValueError(f"Language {language} not supported")
 
@@ -736,6 +739,8 @@ def apply_diff_patch(
         suffix = ".swift"
     elif language in ["json", "json5"]:
         suffix = ".json"
+    elif language == "macaulay2":
+        suffix = ".m2"
     else:
         raise ValueError(f"Language {language} not supported")
 

@@ -192,6 +192,30 @@ async def validate_code_async(
             else:
                 error_msg = stderr.decode() if stderr else "Unknown compilation error"
                 return False, error_msg
+        elif language == "macaulay2":
+            # Use M2 for Macaulay2 syntax checking
+            proc = await asyncio.create_subprocess_exec(
+                "M2",
+                "--check-syntax",
+                code_path,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+
+            try:
+                stdout, stderr = await asyncio.wait_for(
+                    proc.communicate(), timeout=timeout
+                )
+            except asyncio.TimeoutError:
+                proc.kill()
+                await proc.wait()
+                return False, f"Validation timeout after {timeout}s"
+
+            if proc.returncode == 0:
+                return True, None
+            else:
+                error_msg = stderr.decode() if stderr else "Unknown compilation error"
+                return False, error_msg
         else:
             # For other languages, just check if file exists and is readable
             try:

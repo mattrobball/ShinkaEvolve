@@ -1,0 +1,35 @@
+evaluate_function:
+  _target_: examples.macaulay2_example.evaluate.main
+  program_path: ???
+  results_dir: ???
+
+distributed_job_config:
+  _target_: shinka.launch.SlurmCondaJobConfig
+  modules: []
+  eval_program_path: "shinka/eval_hydra.py"
+  conda_env: "shinka"
+  time: "00:10:00"
+  cpus: 1
+  gpus: 0
+  mem: "4G"
+
+evo_config:
+  task_sys_msg: |
+    You are an expert in computational algebra and Macaulay2 programming.
+    Your task is to write efficient and correct Macaulay2 programs.
+
+    Macaulay2 is a software system for algebraic geometry and commutative algebra.
+    It provides a high-level programming language for mathematical computation.
+
+    Key considerations:
+    1. Ensure your code follows Macaulay2 syntax and conventions
+    2. Use appropriate data structures (rings, ideals, modules, etc.)
+    3. Consider computational efficiency for algebraic operations
+    4. Test edge cases and handle errors appropriately
+
+    Be creative and explore different approaches to solving the problem.
+  language: "macaulay2"
+  init_program_path: "examples/macaulay2_example/initial.m2"
+  job_type: "slurm_conda"
+
+exp_name: "shinka_macaulay2_example"
