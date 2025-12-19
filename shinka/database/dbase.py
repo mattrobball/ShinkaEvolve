@@ -14,7 +14,7 @@ from .parents import CombinedParentSelector
 from .inspirations import CombinedContextSelector
 from .islands import CombinedIslandManager
 from .display import DatabaseDisplay
-from shinka.llm.embedding import EmbeddingClient
+from shinka.llm.embedding import EmbeddingClient, get_default_model
 
 logger = logging.getLogger(__name__)
 
@@ -82,8 +82,8 @@ class DatabaseConfig:
     # Beam search parent selection parameters
     num_beams: int = 5
 
-    # Embedding model name
-    embedding_model: str = "text-embedding-3-small"
+    # Embedding model name (defaults to value from embedding_models.yaml or EMBEDDING_MODEL env var)
+    embedding_model: str = field(default_factory=get_default_model)
 
 
 def db_retry(max_retries=5, initial_delay=0.1, backoff_factor=2):
@@ -254,7 +254,7 @@ class ProgramDatabase:
     def __init__(
         self,
         config: DatabaseConfig,
-        embedding_model: str = "text-embedding-3-small",
+        embedding_model: Optional[str] = None,
         read_only: bool = False,
     ):
         self.config = config
@@ -264,7 +264,9 @@ class ProgramDatabase:
         # Only create embedding client if not in read-only mode
         # (e.g., WebUI doesn't need it for visualization)
         if not read_only:
-            self.embedding_client = EmbeddingClient(model_name=embedding_model)
+            # Use provided model, or fall back to config, or get default
+            model_to_use = embedding_model or config.embedding_model
+            self.embedding_client = EmbeddingClient(model_name=model_to_use)
         else:
             self.embedding_client = None
 

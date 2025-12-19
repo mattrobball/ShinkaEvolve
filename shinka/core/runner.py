@@ -18,6 +18,7 @@ from shinka.llm import (
     LLMClient,
     extract_between,
     EmbeddingClient,
+    get_default_model,
     BanditBase,
     AsymmetricUCB,
 )
@@ -158,9 +159,7 @@ class EvolutionRunner:
 
         # Initialize database and scheduler
         db_config.db_path = str(db_path)
-        embedding_model_to_use = (
-            evo_config.embedding_model or "text-embedding-3-small"
-        )
+        embedding_model_to_use = evo_config.embedding_model or get_default_model()
         self.db = ProgramDatabase(
             config=db_config, embedding_model=embedding_model_to_use
         )
@@ -176,13 +175,11 @@ class EvolutionRunner:
             **evo_config.llm_kwargs,
             verbose=verbose,
         )
-        if evo_config.embedding_model is not None:
-            self.embedding = EmbeddingClient(
-                model_name=evo_config.embedding_model,
-                verbose=verbose,
-            )
-        else:
-            self.embedding = None
+        # Always create embedding client (uses default if not specified)
+        self.embedding = EmbeddingClient(
+            model_name=evo_config.embedding_model,
+            verbose=verbose,
+        )
 
         if evo_config.meta_llm_models is not None:
             self.meta_llm = LLMClient(

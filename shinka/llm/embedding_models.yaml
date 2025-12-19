@@ -1,0 +1,104 @@
+# Embedding Models Configuration
+# This file defines all available embedding models, their providers, costs, and metadata.
+# Add new models here without modifying code.
+
+# Default model (can be overridden by environment variable EMBEDDING_MODEL)
+default_model: text-embedding-3-small
+
+# Model definitions
+models:
+  # OpenAI Models
+  text-embedding-3-small:
+    provider: openai
+    cost_per_million_tokens: 0.02  # Standard tier: $0.02/1M tokens
+    cost_per_million_tokens_batch: 0.01  # Batch tier: $0.01/1M tokens (50% savings)
+    dimensions: 1536
+    max_input_tokens: 8191
+    description: "OpenAI's efficient embedding model, recommended for 95% of use cases"
+
+  text-embedding-3-large:
+    provider: openai
+    cost_per_million_tokens: 0.13  # Standard tier: $0.13/1M tokens
+    cost_per_million_tokens_batch: 0.065  # Batch tier: $0.065/1M tokens (50% savings)
+    dimensions: 3072
+    max_input_tokens: 8191
+    description: "OpenAI's most capable embedding model for when semantic quality is critical"
+
+  # Azure OpenAI Models
+  azure-text-embedding-3-small:
+    provider: azure
+    base_model: text-embedding-3-small
+    cost_per_million_tokens: 0.02  # Note: Azure pricing may vary by region
+    dimensions: 1536
+    max_input_tokens: 8191
+    description: "Azure-hosted text-embedding-3-small"
+    env_vars:
+      api_key: AZURE_OPENAI_API_KEY
+      api_version: AZURE_API_VERSION
+      endpoint: AZURE_API_ENDPOINT
+
+  azure-text-embedding-3-large:
+    provider: azure
+    base_model: text-embedding-3-large
+    cost_per_million_tokens: 0.13  # Note: Azure pricing may vary by region
+    dimensions: 3072
+    max_input_tokens: 8191
+    description: "Azure-hosted text-embedding-3-large"
+    env_vars:
+      api_key: AZURE_OPENAI_API_KEY
+      api_version: AZURE_API_VERSION
+      endpoint: AZURE_API_ENDPOINT
+
+  # Google Gemini Models
+  gemini-embedding-001:
+    provider: gemini
+    cost_per_million_tokens: 0.15  # $0.15/1M tokens (as of 2025)
+    dimensions: 768
+    max_input_tokens: 2048
+    description: "Google's production embedding model with 100+ language support"
+    env_vars:
+      api_key: GEMINI_API_KEY
+
+  gemini-embedding-exp-03-07:
+    provider: gemini
+    cost_per_million_tokens: 0.0  # Experimental model - free tier
+    dimensions: 768
+    max_input_tokens: 2048
+    experimental: true
+    deprecated: true
+    deprecation_date: "2025-08-14"
+    description: "Experimental Gemini embedding (deprecated - use gemini-embedding-001)"
+    env_vars:
+      api_key: GEMINI_API_KEY
+
+# Provider configurations
+providers:
+  openai:
+    client_library: openai
+    client_class: OpenAI
+    requires_env_vars:
+      - OPENAI_API_KEY
+
+  azure:
+    client_library: openai
+    client_class: AzureOpenAI
+    strip_prefix: "azure-"
+    requires_env_vars:
+      - AZURE_OPENAI_API_KEY
+      - AZURE_API_VERSION
+      - AZURE_API_ENDPOINT
+
+  gemini:
+    client_library: google.generativeai
+    model_prefix: "models/"
+    task_type: "retrieval_document"
+    requires_env_vars:
+      - GEMINI_API_KEY
+
+# Notes:
+# - Pricing data sourced from official documentation (December 2025)
+# - OpenAI: https://openai.com/api/pricing/
+# - Google Gemini: https://ai.google.dev/gemini-api/docs/pricing
+# - Azure: https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/
+# - Pricing may vary by region for Azure
+# - Free tiers and quotas may apply for experimental models

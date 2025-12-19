@@ -2,80 +2,183 @@ import os
 import openai
 import google.generativeai as genai
 import pandas as pd
-from typing import Union, List, Optional, Tuple
+from typing import Union, List, Optional, Tuple, Dict, Any
 import numpy as np
 import logging
+import yaml
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 
 M = 1_000_000
 
-OPENAI_EMBEDDING_MODELS = [
-    "text-embedding-3-small",
-    "text-embedding-3-large",
-]
+# Global config cache
+_CONFIG_CACHE: Optional[Dict[str, Any]] = None
 
-AZURE_EMBEDDING_MODELS = [
-    "azure-text-embedding-3-small",
-    "azure-text-embedding-3-large",
-]
 
-GEMINI_EMBEDDING_MODELS = [
-    "gemini-embedding-exp-03-07",
-    "gemini-embedding-001",
-]
+def load_embedding_config() -> Dict[str, Any]:
+    """
+    Load embedding models configuration from YAML file.
+    Caches the config to avoid repeated file reads.
 
-OPENAI_EMBEDDING_COSTS = {
-    "text-embedding-3-small": 0.02 / M,
-    "text-embedding-3-large": 0.13 / M,
-}
+    Returns:
+        Dictionary containing models, providers, and default settings
+    """
+    global _CONFIG_CACHE
 
-# Gemini embedding costs (approximate - check current pricing)
-GEMINI_EMBEDDING_COSTS = {
-    "gemini-embedding-exp-03-07": 0.0 / M,  # Experimental model, often free
-    "gemini-embedding-001": 0.0 / M,  # Check current pricing
-}
+    if _CONFIG_CACHE is not None:
+        return _CONFIG_CACHE
+
+    config_path = Path(__file__).parent / "embedding_models.yaml"
+
+    if not config_path.exists():
+        raise FileNotFoundError(
+            f"Embedding models config file not found at {config_path}. "
+            "Please ensure embedding_models.yaml exists."
+        )
+
+    with open(config_path, 'r') as f:
+        _CONFIG_CACHE = yaml.safe_load(f)
+
+    return _CONFIG_CACHE
+
+
+def get_default_model() -> str:
+    """
+    Get the default embedding model.
+    Can be overridden by EMBEDDING_MODEL environment variable.
+
+    Returns:
+        Model name string
+    """
+    env_model = os.getenv("EMBEDDING_MODEL")
+    if env_model:
+        return env_model
+
+    config = load_embedding_config()
+    return config.get("default_model", "text-embedding-3-small")
+
+
+def get_model_cost(model_name: str) -> float:
+    """
+    Get the cost per token for a given model.
+
+    Args:
+        model_name: Name of the embedding model
+
+    Returns:
+        Cost per token (not per million tokens)
+    """
+    config = load_embedding_config()
+    models = config.get("models", {})
+
+    if model_name not in models:
+        logger.warning(f"Model {model_name} not found in config, using 0.0 cost")
+        return 0.0
+
+    model_info = models[model_name]
+    cost_per_million = model_info.get("cost_per_million_tokens", 0.0)
+
+    return cost_per_million / M
 
 def get_client_model(model_name: str) -> tuple[Union[openai.OpenAI, str], str]:
-    if model_name in OPENAI_EMBEDDING_MODELS:
+    """
+    Get the API client and model name for a given embedding model.
+    Loads configuration from YAML file.
+
+    Args:
+        model_name: Name of the embedding model
+
+    Returns:
+        Tuple of (client, model_to_use)
+    """
+    config = load_embedding_config()
+    models = config.get("models", {})
+    providers = config.get("providers", {})
+
+    if model_name not in models:
+        raise ValueError(
+            f"Invalid embedding model: {model_name}. "
+            f"Available models: {', '.join(models.keys())}"
+        )
+
+    model_info = models[model_name]
+    provider = model_info["provider"]
+    provider_info = providers.get(provider, {})
+
+    # Handle OpenAI provider
+    if provider == "openai":
         client = openai.OpenAI()
         model_to_use = model_name
-    elif model_name in AZURE_EMBEDDING_MODELS:
-        # get rid of the azure- prefix
-        model_to_use = model_name.split("azure-")[-1]
+
+    # Handle Azure provider
+    elif provider == "azure":
+        # Get base model name by stripping prefix if configured
+        strip_prefix = provider_info.get("strip_prefix", "")
+        if strip_prefix and model_name.startswith(strip_prefix):
+            model_to_use = model_name[len(strip_prefix):]
+        else:
+            model_to_use = model_info.get("base_model", model_name)
+
+        # Get environment variables from model-specific config or provider defaults
+        env_vars = model_info.get("env_vars", {})
         client = openai.AzureOpenAI(
-            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            api_version=os.getenv("AZURE_API_VERSION"),
-            azure_endpoint=os.getenv("AZURE_API_ENDPOINT"),
+            api_key=os.getenv(env_vars.get("api_key", "AZURE_OPENAI_API_KEY")),
+            api_version=os.getenv(env_vars.get("api_version", "AZURE_API_VERSION")),
+            azure_endpoint=os.getenv(env_vars.get("endpoint", "AZURE_API_ENDPOINT")),
         )
-    elif model_name in GEMINI_EMBEDDING_MODELS:
-        # Configure Gemini API
-        api_key = os.getenv("GEMINI_API_KEY")
+
+    # Handle Gemini provider
+    elif provider == "gemini":
+        env_vars = model_info.get("env_vars", {})
+        api_key = os.getenv(env_vars.get("api_key", "GEMINI_API_KEY"))
         if not api_key:
-            raise ValueError("GEMINI_API_KEY environment variable not set for Gemini models")
+            raise ValueError(
+                f"GEMINI_API_KEY environment variable not set for model {model_name}"
+            )
         genai.configure(api_key=api_key)
         client = "gemini"  # Use string identifier for Gemini
         model_to_use = model_name
+
+        # Log deprecation warning if applicable
+        if model_info.get("deprecated"):
+            deprecation_date = model_info.get("deprecation_date", "unknown")
+            logger.warning(
+                f"Model {model_name} is deprecated and will be removed on {deprecation_date}. "
+                f"Please migrate to an alternative model."
+            )
+
     else:
-        raise ValueError(f"Invalid embedding model: {model_name}")
+        raise ValueError(
+            f"Unsupported provider: {provider} for model {model_name}"
+        )
 
     return client, model_to_use
 
 
 class EmbeddingClient:
     def __init__(
-        self, model_name: str = "text-embedding-3-small", verbose: bool = False
+        self, model_name: Optional[str] = None, verbose: bool = False
     ):
         """
         Initialize the EmbeddingClient.
 
         Args:
-            model (str): The OpenAI, Azure, or Gemini embedding model name to use.
+            model_name (str, optional): The embedding model name to use.
+                If None, uses default from config or EMBEDDING_MODEL env var.
+            verbose (bool): Whether to enable verbose logging.
         """
+        if model_name is None:
+            model_name = get_default_model()
+
         self.client, self.model = get_client_model(model_name)
         self.model_name = model_name
         self.verbose = verbose
+
+        # Load model configuration for metadata access
+        config = load_embedding_config()
+        self.model_config = config.get("models", {}).get(model_name, {})
 
     def get_embedding(
         self, code: Union[str, List[str]]
@@ -96,23 +199,32 @@ class EmbeddingClient:
             single_code = True
         else:
             single_code = False
+        # Get cost per token for this model
+        cost_per_token = get_model_cost(self.model_name)
+
         # Handle Gemini models
-        if self.model_name in GEMINI_EMBEDDING_MODELS:
+        if self.model_config.get("provider") == "gemini":
             try:
                 embeddings = []
                 total_tokens = 0
-                
+
+                # Get provider config for model prefix
+                config = load_embedding_config()
+                provider_info = config.get("providers", {}).get("gemini", {})
+                model_prefix = provider_info.get("model_prefix", "models/")
+                task_type = provider_info.get("task_type", "retrieval_document")
+
                 for text in code:
                     result = genai.embed_content(
-                        model=f"models/{self.model}",
+                        model=f"{model_prefix}{self.model}",
                         content=text,
-                        task_type="retrieval_document"
+                        task_type=task_type
                     )
                     embeddings.append(result['embedding'])
                     total_tokens += len(text.split())
-                
-                cost = total_tokens * GEMINI_EMBEDDING_COSTS.get(self.model, 0.0)
-                
+
+                cost = total_tokens * cost_per_token
+
                 if single_code:
                     return embeddings[0] if embeddings else [], cost
                 else:
@@ -128,7 +240,7 @@ class EmbeddingClient:
             response = self.client.embeddings.create(
                 model=self.model, input=code, encoding_format="float"
             )
-            cost = response.usage.total_tokens * OPENAI_EMBEDDING_COSTS[self.model]
+            cost = response.usage.total_tokens * cost_per_token
             # Extract embedding from response
             if single_code:
                 return response.data[0].embedding, cost

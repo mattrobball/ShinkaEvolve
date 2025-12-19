@@ -46,6 +46,7 @@ dependencies = [
     "markdown",
     "aiofiles",
     "google-generativeai",
+    "pyyaml",
 ]
 
 [tool.setuptools]
