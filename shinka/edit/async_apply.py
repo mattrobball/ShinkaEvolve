@@ -196,7 +196,7 @@ async def validate_code_async(
             # Use M2 for Macaulay2 syntax checking
             proc = await asyncio.create_subprocess_exec(
                 "M2",
-                "--check-syntax",
+                "--script",
                 code_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,

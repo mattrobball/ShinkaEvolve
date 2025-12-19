@@ -72,6 +72,6 @@ To adapt this example for your own Macaulay2 problems:
 ## Notes
 
 - Macaulay2 programs use `.m2` file extension
-- The syntax validator uses `M2 --check-syntax` (if available)
+- The syntax validator uses `M2 --script` to check for syntax errors
 - Comment style: `--` (double dash)
 - Complexity analysis uses regex-based pattern matching (same as C++/Rust)
