@@ -51,30 +51,49 @@ def query_gemini(
         )
         try:
             text = response.choices[0].message.content
-        except Exception:
+            # Handle None content (can happen with some Gemini models)
+            if text is None:
+                logger.warning(f"Gemini response content is None for model {model}")
+                # Try to get from refusal field if available
+                if hasattr(response.choices[0].message, 'refusal') and response.choices[0].message.refusal:
+                    text = f"[REFUSAL] {response.choices[0].message.refusal}"
+                else:
+                    # Log the full response for debugging
+                    logger.error(f"Full response object: {response}")
+                    raise ValueError(f"Gemini returned None content. Model: {model}, Response: {response}")
+        except Exception as e:
+            logger.warning(f"Error accessing standard content field: {e}")
             # Reasoning models - ResponseOutputMessage
-            text = response.output[1].content[0].text
+            try:
+                text = response.output[1].content[0].text
+            except Exception as e2:
+                logger.error(f"Failed to access alternate response format: {e2}")
+                logger.error(f"Full response: {response}")
+                raise ValueError(f"Unable to extract content from Gemini response: {e2}")
         new_msg_history.append({"role": "assistant", "content": text})
     else:
         raise ValueError("Gemini does not support structured output.")
 
+    # Safely handle potential None content for thought extraction
+    message_content = response.choices[0].message.content or text or ""
+
     thought_match = re.search(
-        r"<thought>(.*?)</thought>", response.choices[0].message.content, re.DOTALL
+        r"<thought>(.*?)</thought>", message_content, re.DOTALL
     )
 
     thought = thought_match.group(1) if thought_match else ""
 
     content_match = re.search(
-        r"<thought>(.*?)</thought>", response.choices[0].message.content, re.DOTALL
+        r"<thought>(.*?)</thought>", message_content, re.DOTALL
     )
     if content_match:
         # Extract everything before and after the <thought> tag as content
         content = (
-            response.choices[0].message.content[: content_match.start()]
-            + response.choices[0].message.content[content_match.end() :]
+            message_content[: content_match.start()]
+            + message_content[content_match.end() :]
         ).strip()
     else:
-        content = response.choices[0].message.content
+        content = message_content
 
     input_cost = GEMINI_MODELS[model]["input_price"] * response.usage.prompt_tokens
     output_tokens = response.usage.total_tokens - response.usage.prompt_tokens

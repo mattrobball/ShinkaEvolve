@@ -31,6 +31,6 @@ evo_config:
   meta_llm_kwargs:
     temperatures:
       - 0.0
-  embedding_model: "text-embedding-3-small"
+  # embedding_model uses default from shinka/llm/embedding_models.yaml (gemini-embedding-001)
   results_dir: ${output_dir}
   

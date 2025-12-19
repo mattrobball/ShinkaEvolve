@@ -3,7 +3,7 @@
 # Add new models here without modifying code.
 
 # Default model (can be overridden by environment variable EMBEDDING_MODEL)
-default_model: text-embedding-3-small
+default_model: gemini-embedding-001
 
 # Model definitions
 models:
