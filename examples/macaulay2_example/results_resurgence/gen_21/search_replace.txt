@@ -1,0 +1,49 @@
+<NAME>
+star_configuration_4_lines
+</NAME>
+
+<DESCRIPTION>
+I propose replacing the current point configuration (a subset of the B3 arrangement) with a **Star Configuration of 4 generic lines** in $\mathbb{P}^2$.
+
+The Star Configuration of $s$ lines has a known resurgence of $\rho(I) = \frac{s-1}{s-2}$.
+For $s=4$, the resurgence is $1.5$.
+This configuration is theoretically superior to generic points ($\rho=1$) and likely better than the current subset of B3 which showed a lower bound of 1.0.
+Specifically, with $\rho=1.5$, we expect to observe containment failures for pairs $(m,r)$ where $m/r < 1.5$.
+For example, the containment $I^{(4)} \subseteq I^3$ (ratio 1.33) is expected to fail, whereas in the previous run it held. Observing this failure will increase the `resurgence_lower_bound` metric from 1.0 to at least 1.33.
+The code generates the ideal of the 6 intersection points of the 4 lines $x, y, z, x+y+z$.
+</DESCRIPTION>
+
+<DIFF>
+<<<<<<< SEARCH
+R = QQ[x,y,z]
+
+-- Define the ideal of a point configuration
+-- Using points of multiplicity >= 3 from the B3 arrangement (signed permutations)
+-- These 7 points are highly special (intersections of 4 lines each from the arrangement)
+pts = {
+    ideal(y, z),            -- (1:0:0)
+    ideal(x, z),            -- (0:1:0)
+    ideal(x, y),            -- (0:0:1)
+    ideal(x-y, y-z),        -- (1:1:1)
+    ideal(x+y, y+z),        -- (1:-1:1)
+    ideal(x+y, y-z),        -- (-1:1:1)
+    ideal(x-y, y+z)         -- (1:1:-1) equivalent to (-1:-1:1)
+}
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+=======
+R = QQ[x,y,z]
+
+-- Define the ideal of a point configuration
+-- Using a Star Configuration of 4 generic lines in P^2
+-- The star configuration of s lines has resurgence (s-1)/(s-2)
+-- For s=4, resurgence is 1.5, which should produce containment failures for m/r < 1.5
+L = {x, y, z, x+y+z}
+pts = flatten apply(4, i -> apply(i, j -> ideal(L#i, L#j)))
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+>>>>>>> REPLACE
+
+</DIFF>

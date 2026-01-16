@@ -1,0 +1,18 @@
+{
+  "combined_score": 0.0,
+  "error": "Failed to load /home/matt.linux/misc/shinka_fork/examples/macaulay2_example/results_resurgence/gen_5/main.m2",
+  "public": {
+    "success": false
+  },
+  "private": {
+    "stdout": "RESURGENCE_ERROR: Failed to load /home/matt.linux/misc/shinka_fork/examples/macaulay2_example/results_resurgence/gen_5/main.m2\n",
+    "stderr": ""
+  },
+  "execution_time_mean": 0.45635052100988105,
+  "execution_time_std": 0.0,
+  "num_valid_runs": 0,
+  "num_invalid_runs": 1,
+  "all_validation_errors": [
+    "Computation failed: Failed to load /home/matt.linux/misc/shinka_fork/examples/macaulay2_example/results_resurgence/gen_5/main.m2"
+  ]
+}

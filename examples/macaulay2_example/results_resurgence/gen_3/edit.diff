@@ -1,0 +1,54 @@
+--- a/original.m2
++++ b/original.m2
+@@ -1,26 +1,39 @@
+ -- Resurgence optimization: find point configurations with large resurgence
+ -- The ideal I defined here will be evaluated for its resurgence properties
+ --
+ -- Resurgence rho(I) = sup{m/r : I^(m) not contained in I^r}
+ -- For generic points, resurgence is close to 1
+ -- Special configurations (Fermat points, star configurations) can have larger resurgence
+ 
+ -- EVOLVE-BLOCK-START
+--- Define points in affine 2-space (or projective 2-space)
+--- The evolution should find point configurations with high resurgence
++-- Jacobian Star Configuration Generator
++-- Generates the ideal of points dual to an arrangement of lines (Star Configuration)
++-- This approach avoids manual point entry and scales to configurations with high resurgence
+ 
+ R = QQ[x,y]
+ 
+--- Define the ideal of a point configuration
+--- Starting with a simple configuration - evolution should find better ones
+--- Example: 4 points forming a square
+-pts = {
+-    ideal(x, y),           -- origin
+-    ideal(x-1, y),         -- (1,0)
+-    ideal(x, y-1),         -- (0,1)
+-    ideal(x-1, y-1)        -- (1,1)
++-- Define a set of 6 lines in affine space with distinct slopes to avoid parallelism.
++-- These lines are chosen to be in general position (no 3 intersect at a point).
++-- A star configuration of d lines in P^2 creates d(d-1)/2 points.
++-- For d=6, we get 15 points.
++L = {
++    x,
++    y,
++    x + y - 1,
++    x - y - 1,
++    2*x + y - 5,
++    x + 2*y - 7
+ }
+ 
+--- The ideal I is the intersection of the point ideals
+-I = intersect pts
++-- Construct the defining polynomial of the line arrangement
++F = product L
++
++-- The ideal of the point configuration is the singular locus of the curve F=0
++-- For lines in general position, this locus consists of the pairwise intersection points (nodes).
++-- We define J as the Jacobian ideal plus the ideal of F itself.
++J = ideal(diff(x,F), diff(y,F)) + ideal(F)
++
++-- We take the radical to ensure we have the ideal of the reduced points.
++-- The resulting ideal I represents the Star Configuration of 15 points.
++I = radical J
+ -- EVOLVE-BLOCK-END

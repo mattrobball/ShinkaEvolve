@@ -1,0 +1,45 @@
+<NAME>
+b3_arrangement_points
+</NAME>
+
+<DESCRIPTION>
+Change the point configuration to the set of points of multiplicity >= 3 in the B3 hyperplane arrangement (singular locus). This configuration consists of 7 points in projective plane: the 3 coordinate points and 4 points of the form (+/-1 : +/-1 : 1). These points are intersections of 4 lines each in the arrangement, providing a highly non-generic structure expected to have higher resurgence than a simple square.
+</DESCRIPTION>
+
+<DIFF>
+<<<<<<< SEARCH
+R = QQ[x,y]
+
+-- Define the ideal of a point configuration
+-- Starting with a simple configuration - evolution should find better ones
+-- Example: 4 points forming a square
+pts = {
+    ideal(x, y),           -- origin
+    ideal(x-1, y),         -- (1,0)
+    ideal(x, y-1),         -- (0,1)
+    ideal(x-1, y-1)        -- (1,1)
+}
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+=======
+R = QQ[x,y,z]
+
+-- Define the ideal of a point configuration
+-- Using points of multiplicity >= 3 from the B3 arrangement (signed permutations)
+-- These 7 points are highly special (intersections of 4 lines each from the arrangement)
+pts = {
+    ideal(y, z),            -- (1:0:0)
+    ideal(x, z),            -- (0:1:0)
+    ideal(x, y),            -- (0:0:1)
+    ideal(x-y, y-z),        -- (1:1:1)
+    ideal(x+y, y+z),        -- (1:-1:1)
+    ideal(x+y, y-z),        -- (-1:1:1)
+    ideal(x-y, y+z)         -- (1:1:-1) equivalent to (-1:-1:1)
+}
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+>>>>>>> REPLACE
+
+</DIFF>

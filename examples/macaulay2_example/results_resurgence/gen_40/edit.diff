@@ -1,0 +1,42 @@
+--- a/original.m2
++++ b/original.m2
+@@ -1,23 +1,33 @@
+ -- Resurgence optimization: find point configurations with large resurgence
+ -- The ideal I defined here will be evaluated for its resurgence properties
+ --
+ -- Resurgence rho(I) = sup{m/r : I^(m) not contained in I^r}
+ -- For generic points, resurgence is close to 1
+ -- Special configurations (Fermat points, star configurations) can have larger resurgence
+ 
+ -- EVOLVE-BLOCK-START
+ -- Define points in affine 2-space (or projective 2-space)
+ -- The evolution should find point configurations with high resurgence
+ 
+ R = QQ[x,y,z]
+ 
+--- Define the ideal of a point configuration
+--- Using a Star Configuration of 4 generic lines in P^2
+--- The star configuration of s lines has resurgence (s-1)/(s-2)
+--- For s=4, resurgence is 1.5, which should produce containment failures for m/r < 1.5
+-L = {x, y, z, x+y+z}
+-pts = flatten apply(4, i -> apply(i, j -> ideal(L#i, L#j)))
++-- Define the ideal of a point configuration using a line arrangement polynomial.
++-- We target the Star Configuration of 3 lines (s=3), which is known to have
++-- a resurgence of (s-1)/(s-2) = 2/1 = 2.
++-- This is higher than the s=4 case (rho=1.5) or Hessian arrangements.
++-- The polynomial F defines the union of 3 lines: x=0, y=0, z=0.
++F = x*y*z
++
++-- The singular locus of this arrangement consists of the pairwise intersection points.
++-- For F = xyz, the singular locus is given by the Jacobian ideal.
++-- J = (yz, xz, xy)
++-- The points are (1:0:0), (0:1:0), (0:0:1).
++J = ideal jacobian ideal F
++
++-- Extract the minimal primes of the Jacobian ideal to get the ideals of the individual points.
++pts = minimalPrimes J
+ 
+ -- The ideal I is the intersection of the point ideals
++-- For s=3, I should be (xy, yz, zx)
+ I = intersect pts
+ -- EVOLVE-BLOCK-END

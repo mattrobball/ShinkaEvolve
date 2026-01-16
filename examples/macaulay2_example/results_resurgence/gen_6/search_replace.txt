@@ -1,0 +1,62 @@
+<NAME>
+star_config_6_lines
+</NAME>
+
+<DESCRIPTION>
+I propose changing the point configuration to a "Star Configuration" formed by 6 lines in $\mathbb{P}^2$ in general position.
+
+Reasoning:
+1.  **High Resurgence:** Star configurations (intersections of $s$ hyperplanes taken $c$ at a time) are known to have high resurgence. For points in $\mathbb{P}^2$ formed by $s$ generic lines, the resurgence is expected to be higher than that of the Fermat configuration (which corresponds to a specific arrangement related to $s=9$ but with triple points).
+2.  **Targeted Failure:** With $s=6$ lines, we expect to find containment failures such as $I^{(5)} \not\subseteq I^3$, which gives a ratio of $5/3 \approx 1.67$. This is greater than the $1.5$ ratio ($I^{(3)} \not\subseteq I^2$) obtained from the Fermat configuration.
+3.  **Robustness:** By defining the ideal as the intersection of all pairwise intersections of 6 specific lines in general position, we guarantee a radical ideal of 15 distinct points.
+4.  **Generality:** Using generic integer coefficients for the lines ensures we avoid accidental symmetries or triple points that might lower the resurgence or alter the expected behavior of a generic star configuration.
+
+The ideal is constructed by intersecting the $\binom{6}{2}=15$ ideals of the points where each pair of lines meets.
+</DESCRIPTION>
+
+<DIFF>
+<<<<<<< SEARCH
+R = QQ[x,y,z]
+
+-- The Fermat configuration of 12 points in P^2
+-- These are the intersection points of the lines defined by x^3-y^3, y^3-z^3, z^3-x^3
+-- This configuration is known to provide a counterexample to I^(3) <= I^2
+I = ideal(
+    x*(y^3-z^3),
+    y*(z^3-x^3),
+    z*(x^3-y^3)
+)
+
+-- Derive the points from the ideal for completeness
+pts = decompose I
+=======
+R = QQ[x,y,z]
+
+-- Star configuration of 6 lines in P^2
+-- Defined as the set of pairwise intersections of 6 lines in general position.
+-- This yields 15 points.
+-- Star configurations are known to exhibit high resurgence.
+-- For s lines, resurgence is often related to ratios involving s.
+-- With s=6, we target containment failures like I^(5) not in I^3 (ratio 1.66).
+
+-- Define 6 lines in general position (using coefficients to ensure no triple points)
+L = {
+    x,
+    y,
+    z,
+    x + y + z,
+    x - y + z,
+    x + 2*y + 3*z
+}
+
+-- The ideal I of a star configuration is the intersection of the ideals of all pairs of lines.
+-- There are binomial(6,2) = 15 such points.
+-- We compute I as the intersection of these pair ideals.
+pairIdeals = apply(subsets(L, 2), pair -> ideal(pair#0, pair#1))
+I = intersect pairIdeals
+
+-- Derive the points from the ideal for completeness
+pts = decompose I
+>>>>>>> REPLACE
+
+</DIFF>

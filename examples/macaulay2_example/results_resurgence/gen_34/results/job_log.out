@@ -1,0 +1,31 @@
+Evaluating Macaulay2 program for resurgence: results_resurgence/gen_34/main.m2
+Saving results to: results_resurgence/gen_34/results
+
+Run 1/1 completed in 11.71s
+Correctness saved to results_resurgence/gen_34/results/correct.json
+Metrics saved to results_resurgence/gen_34/results/metrics.json
+
+Evaluation completed successfully.
+
+=== Metrics ===
+Combined Score: 158.33
+
+Resurgence Lower Bound: 1.33333
+Containment Failures: 5
+Waldschmidt Constant: None
+Ideal Generators: 4
+Ideal Dimension: 1
+
+Containment Checks:
+  I^(4) ⊆ I^2: ✓ (ratio 2.000)
+  I^(6) ⊆ I^3: ✓ (ratio 2.000)
+  I^(5) ⊆ I^3: ✓ (ratio 1.667)
+  I^(7) ⊆ I^4: ✓ (ratio 1.750)
+  I^(3) ⊆ I^2: ✓ (ratio 1.500)
+  I^(5) ⊆ I^4: ✗ (ratio 1.250)
+  I^(4) ⊆ I^3: ✗ (ratio 1.333)
+  I^(2) ⊆ I^1: ✓ (ratio 2.000)
+  I^(3) ⊆ I^1: ✓ (ratio 3.000)
+  I^(2) ⊆ I^2: ✗ (ratio 1.000)
+  I^(3) ⊆ I^3: ✗ (ratio 1.000)
+  I^(4) ⊆ I^4: ✗ (ratio 1.000)

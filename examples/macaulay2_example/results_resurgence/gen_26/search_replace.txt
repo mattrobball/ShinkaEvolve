@@ -1,0 +1,38 @@
+<NAME>
+b3_arrangement_singular_locus
+</NAME>
+
+<DESCRIPTION>
+Replace the star configuration with the singular locus of the B3 reflection arrangement. This configuration consists of 13 points with varying multiplicities (intersections of 4, 3, and 2 lines). The high multiplicities and symmetry of this arrangement are expected to yield a higher resurgence than the simple star configuration.
+</DESCRIPTION>
+
+<DIFF>
+<<<<<<< SEARCH
+R = QQ[x,y,z]
+
+-- Define the ideal of a point configuration
+-- Using a Star Configuration of 4 generic lines in P^2
+-- The star configuration of s lines has resurgence (s-1)/(s-2)
+-- For s=4, resurgence is 1.5, which should produce containment failures for m/r < 1.5
+L = {x, y, z, x+y+z}
+pts = flatten apply(4, i -> apply(i, j -> ideal(L#i, L#j)))
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+=======
+R = QQ[x,y,z]
+
+-- Define the ideal of a point configuration
+-- Using the singular locus of the B3 reflection arrangement (9 lines)
+-- Lines: x, y, z, x+/-y, x+/-z, y+/-z
+-- This arrangement creates points with high multiplicity (up to 4 lines intersecting)
+-- Such configurations (rational points of high multiplicity arrangements) often have high resurgence
+F = x*y*z*(x^2-y^2)*(x^2-z^2)*(y^2-z^2)
+J = ideal jacobian ideal F
+pts = minimalPrimes J
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+>>>>>>> REPLACE
+
+</DIFF>

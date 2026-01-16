@@ -1,0 +1,32 @@
+-- EVOLVE-BLOCK-START
+-- Jacobian Star Configuration Generator
+-- Generates the ideal of points dual to an arrangement of lines (Star Configuration)
+-- This approach avoids manual point entry and scales to configurations with high resurgence
+
+R = QQ[x,y]
+
+-- Define a set of 6 lines in affine space with distinct slopes to avoid parallelism.
+-- These lines are chosen to be in general position (no 3 intersect at a point).
+-- A star configuration of d lines in P^2 creates d(d-1)/2 points.
+-- For d=6, we get 15 points.
+L = {
+    x,
+    y,
+    x + y - 1,
+    x - y - 1,
+    2*x + y - 5,
+    x + 2*y - 7
+}
+
+-- Construct the defining polynomial of the line arrangement
+F = product L
+
+-- The ideal of the point configuration is the singular locus of the curve F=0
+-- For lines in general position, this locus consists of the pairwise intersection points (nodes).
+-- We define J as the Jacobian ideal plus the ideal of F itself.
+J = ideal(diff(x,F), diff(y,F)) + ideal(F)
+
+-- We take the radical to ensure we have the ideal of the reduced points.
+-- The resulting ideal I represents the Star Configuration of 15 points.
+I = radical J
+-- EVOLVE-BLOCK-END

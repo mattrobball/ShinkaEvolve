@@ -1,0 +1,17 @@
+Evaluating Macaulay2 program for resurgence: results_resurgence/gen_19/main.m2
+Saving results to: results_resurgence/gen_19/results
+
+Run 1/1 completed in 120.55s
+Correctness saved to results_resurgence/gen_19/results/correct.json
+Metrics saved to results_resurgence/gen_19/results/metrics.json
+
+Evaluation failed: Validation failed: Computation failed: Computation timed out after 120 seconds
+
+=== Metrics ===
+Combined Score: 0.00
+
+Resurgence Lower Bound: N/A
+Containment Failures: 0
+Waldschmidt Constant: N/A
+Ideal Generators: N/A
+Ideal Dimension: N/A

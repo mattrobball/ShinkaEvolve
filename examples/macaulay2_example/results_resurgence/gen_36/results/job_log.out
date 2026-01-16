@@ -1,0 +1,17 @@
+Evaluating Macaulay2 program for resurgence: results_resurgence/gen_36/main.m2
+Saving results to: results_resurgence/gen_36/results
+
+Run 1/1 completed in 0.39s
+Correctness saved to results_resurgence/gen_36/results/correct.json
+Metrics saved to results_resurgence/gen_36/results/metrics.json
+
+Evaluation failed: Validation failed: Computation failed: M2 syntax/runtime error: /usr/share/Macaulay2/Core/methods.m2:170:23:(1):[6]: error: no method found for applying product to:
+
+=== Metrics ===
+Combined Score: 0.00
+
+Resurgence Lower Bound: N/A
+Containment Failures: 0
+Waldschmidt Constant: N/A
+Ideal Generators: N/A
+Ideal Dimension: N/A

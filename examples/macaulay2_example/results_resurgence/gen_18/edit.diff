@@ -1,0 +1,47 @@
+--- a/original.m2
++++ b/original.m2
+@@ -1,29 +1,32 @@
+ -- Resurgence optimization: find point configurations with large resurgence
+ -- The ideal I defined here will be evaluated for its resurgence properties
+ --
+ -- Resurgence rho(I) = sup{m/r : I^(m) not contained in I^r}
+ -- For generic points, resurgence is close to 1
+ -- Special configurations (Fermat points, star configurations) can have larger resurgence
+ 
+ -- EVOLVE-BLOCK-START
+ -- Define points in affine 2-space (or projective 2-space)
+ -- The evolution should find point configurations with high resurgence
+ 
+ R = QQ[x,y,z]
+ 
+--- Define the ideal of a point configuration
+--- Using points of multiplicity >= 3 from the B3 arrangement (signed permutations)
+--- These 7 points are highly special (intersections of 4 lines each from the arrangement)
+-pts = {
+-    ideal(y, z),            -- (1:0:0)
+-    ideal(x, z),            -- (0:1:0)
+-    ideal(x, y),            -- (0:0:1)
+-    ideal(x-y, y-z),        -- (1:1:1)
+-    ideal(x+y, y+z),        -- (1:-1:1)
+-    ideal(x+y, y-z),        -- (-1:1:1)
+-    ideal(x-y, y+z)         -- (1:1:-1) equivalent to (-1:-1:1)
+-}
++-- Algorithmic approach: Construct a Star Configuration of 6 lines.
++-- A star configuration consists of all pairwise intersections of d lines in general position.
++-- Such configurations are known to maximize containment failures and resurgence.
++-- We use lines L_t dual to points on a rational normal curve to ensure general position.
++
++-- Generate 6 lines L_t : x + t*y + t^2*z = 0 for t = 0..5
++lines = apply(0..5, t -> x + t*y + t^2*z)
++
++-- Generate the 15 intersection points (all pairwise intersections)
++-- This procedural generation ensures a robust configuration with high resurgence (rho = 5/3)
++pts = flatten apply(0..4, i -> 
++    apply(i+1..5, j -> 
++        ideal(lines#i, lines#j)
++    )
++)
+ 
+ -- The ideal I is the intersection of the point ideals
+ I = intersect pts
+ -- EVOLVE-BLOCK-END

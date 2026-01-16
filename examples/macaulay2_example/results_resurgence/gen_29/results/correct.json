@@ -1,0 +1,4 @@
+{
+  "correct": false,
+  "error": "Validation failed: Computation failed: M2 syntax/runtime error: results_resurgence/gen_29/main.m2:21:13:(3):[5]: error: assignment to protected global variable 'lines', originally defined at /usr/share/Macaulay2/Core/startup.m2:136:5:(0):"
+}

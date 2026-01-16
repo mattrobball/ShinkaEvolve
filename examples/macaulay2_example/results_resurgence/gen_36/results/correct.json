@@ -1,0 +1,4 @@
+{
+  "correct": false,
+  "error": "Validation failed: Computation failed: M2 syntax/runtime error: /usr/share/Macaulay2/Core/methods.m2:170:23:(1):[6]: error: no method found for applying product to:"
+}

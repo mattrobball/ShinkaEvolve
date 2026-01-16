@@ -1,0 +1,25 @@
+-- EVOLVE-BLOCK-START
+-- Define points in affine 2-space (or projective 2-space)
+-- The evolution should find point configurations with high resurgence
+
+R = QQ[x,y,z]
+
+-- Algorithmic approach: Construct a Star Configuration of 6 lines.
+-- A star configuration consists of all pairwise intersections of d lines in general position.
+-- Such configurations are known to maximize containment failures and resurgence.
+-- We use lines L_t dual to points on a rational normal curve to ensure general position.
+
+-- Generate 6 lines L_t : x + t*y + t^2*z = 0 for t = 0..5
+lines = apply(0..5, t -> x + t*y + t^2*z)
+
+-- Generate the 15 intersection points (all pairwise intersections)
+-- This procedural generation ensures a robust configuration with high resurgence (rho = 5/3)
+pts = flatten apply(0..4, i -> 
+    apply(i+1..5, j -> 
+        ideal(lines#i, lines#j)
+    )
+)
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+-- EVOLVE-BLOCK-END

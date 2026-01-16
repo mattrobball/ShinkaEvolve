@@ -1,0 +1,20 @@
+{
+  "combined_score": 0.0,
+  "error": "M2 syntax/runtime error: results_resurgence/gen_29/main.m2:21:13:(3):[5]: error: assignment to protected global variable 'lines', originally defined at /usr/share/Macaulay2/Core/startup.m2:136:5:(0):",
+  "text_feedback": "# M2 Execution Error\n\n## Error Message:\nM2 syntax/runtime error: results_resurgence/gen_29/main.m2:21:13:(3):[5]: error: assignment to protected global variable 'lines', originally defined at /usr/share/Macaulay2/Core/startup.m2:136:5:(0):\n\n## Common issues to check:\n\n- Ensure the ideal I is defined (not just pts or R)\n\n- Check M2 syntax: use 'ideal(...)' not 'Ideal(...)'\n\n- Point ideals should be: ideal(x-a, y-b) for point (a,b)\n\n- Use 'intersect' to combine ideals: I = intersect {i1, i2, ...}\n\n- Ensure all variables are defined in the ring R\n\n- AVOID underscores in variable names! M2 uses _ for subscripts.\n\n  Bad: lines_B3, pts_list  Good: linesB3, ptsList\n\n- 'set {}' creates empty set; add with: mySet = mySet + set{newElement}\n",
+  "public": {
+    "success": false,
+    "error": "M2 syntax/runtime error: results_resurgence/gen_29/main.m2:21:13:(3):[5]: error: assignment to protected global variable 'lines', originally defined at /usr/share/Macaulay2/Core/startup.m2:136:5:(0):"
+  },
+  "private": {
+    "stdout": "",
+    "stderr": ""
+  },
+  "execution_time_mean": 0.414199979044497,
+  "execution_time_std": 0.0,
+  "num_valid_runs": 0,
+  "num_invalid_runs": 1,
+  "all_validation_errors": [
+    "Computation failed: M2 syntax/runtime error: results_resurgence/gen_29/main.m2:21:13:(3):[5]: error: assignment to protected global variable 'lines', originally defined at /usr/share/Macaulay2/Core/startup.m2:136:5:(0):"
+  ]
+}

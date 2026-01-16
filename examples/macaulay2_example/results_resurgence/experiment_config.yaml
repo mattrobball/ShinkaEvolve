@@ -1,0 +1,98 @@
+database_config:
+  archive_size: 40
+  db_path: results_resurgence/evolution_db.sqlite
+  elite_selection_ratio: 0.3
+  embedding_model: gemini-embedding-001
+  enforce_island_separation: true
+  exploitation_alpha: 1.0
+  exploitation_ratio: 0.2
+  island_elitism: true
+  migration_interval: 10
+  migration_rate: 0.1
+  num_archive_inspirations: 4
+  num_beams: 5
+  num_islands: 2
+  num_top_k_inspirations: 2
+  parent_selection_lambda: 10.0
+  parent_selection_strategy: weighted
+evolution_config:
+  code_embed_sim_threshold: 0.995
+  embedding_model: gemini-embedding-001
+  init_program_path: initial.m2
+  job_type: local
+  language: macaulay2
+  llm_dynamic_selection: ucb1
+  llm_dynamic_selection_kwargs:
+    exploration_coef: 1.0
+  llm_kwargs:
+    max_tokens: 32768
+    reasoning_efforts:
+    - auto
+    - low
+    - medium
+    - high
+    temperatures:
+    - 0.0
+    - 0.5
+    - 1.0
+  llm_models:
+  - gemini-3-pro-preview
+  max_novelty_attempts: 3
+  max_parallel_jobs: 3
+  max_patch_attempts: 3
+  max_patch_resamples: 3
+  meta_llm_kwargs:
+    max_tokens: 16384
+    temperatures:
+    - 0.0
+  meta_llm_models:
+  - gemini-3-flash-preview
+  meta_max_recommendations: 5
+  meta_rec_interval: 10
+  novelty_llm_kwargs:
+    max_tokens: 16384
+    temperatures:
+    - 0.0
+  novelty_llm_models:
+  - gemini-3-flash-preview
+  num_generations: 200
+  patch_type_probs:
+  - 0.5
+  - 0.4
+  - 0.1
+  patch_types:
+  - diff
+  - full
+  - cross
+  results_dir: results_resurgence
+  task_sys_msg: "You are an expert in commutative algebra and algebraic geometry,\
+    \ specializing in symbolic powers of ideals and the containment problem.\n\nGOAL:\
+    \ Find point configurations in affine 2-space (or projective 2-space) whose ideal\
+    \ I has maximal resurgence.\n\nBACKGROUND:\n- The resurgence \u03C1(I) = sup{m/r\
+    \ : I^(m) \u2284 I^r} measures containment failures between symbolic and ordinary\
+    \ powers\n- For generic points, resurgence approaches 1\n- Special configurations\
+    \ can have higher resurgence\n- Finding configurations where I^(3) \u2284 I^2\
+    \ (resurgence > 3/2) is particularly interesting\n\nKNOWN HIGH-RESURGENCE CONFIGURATIONS:\n\
+    1. Fermat configurations: Points defined by x^n - y^n = 0 and similar\n2. Star\
+    \ configurations: Points at intersections of lines through a common point\n3.\
+    \ Points on special curves (e.g., cuspidal cubics)\n4. Configurations with high\
+    \ multiplicity structure\n\nMACAULAY2 SYNTAX:\n- Define ring: R = QQ[x,y] or R\
+    \ = QQ[x,y,z] for projective\n- Point ideals: ideal(x-a, y-b) for point (a,b)\n\
+    - Intersection: I = intersect {ideal1, ideal2, ...}\n- Can also use saturations,\
+    \ primary decomposition, etc.\n\nDIRECTIONS TO EXPLORE:\n1. Try different numbers\
+    \ of points (more points = more possibilities)\n2. Explore algebraic relationships\
+    \ between point coordinates\n3. Consider points with rational or algebraic coordinates\n\
+    4. Try configurations with symmetry (cyclic, dihedral groups)\n5. Explore points\
+    \ on curves with special properties\n6. Consider weighted/fat point schemes (though\
+    \ standard points are the focus)\n\nThe evolved code must define an ideal I in\
+    \ a polynomial ring R over QQ.\n\nBe creative! This is an open research problem\
+    \ - novel configurations that achieve high resurgence could be mathematically\
+    \ significant."
+  use_text_feedback: false
+job_config:
+  conda_env: null
+  eval_program_path: evaluate.py
+  extra_cmd_args: {}
+  time: null
+results_directory: results_resurgence
+timestamp: '2026-01-16T10:14:38.017721'

@@ -1,0 +1,74 @@
+--- a/original.m2
++++ b/original.m2
+@@ -1,26 +1,63 @@
+ -- Resurgence optimization: find point configurations with large resurgence
+ -- The ideal I defined here will be evaluated for its resurgence properties
+ --
+ -- Resurgence rho(I) = sup{m/r : I^(m) not contained in I^r}
+ -- For generic points, resurgence is close to 1
+ -- Special configurations (Fermat points, star configurations) can have larger resurgence
+ 
+ -- EVOLVE-BLOCK-START
+ -- Define points in affine 2-space (or projective 2-space)
+ -- The evolution should find point configurations with high resurgence
+ 
++-- Strategy: Use the B3 reflection arrangement of 9 lines.
++-- The intersection points of these lines include points of multiplicity 4 and 3.
++-- We project this configuration to a generic affine chart to capture all special points.
++
+ R = QQ[x,y]
++S_aux = QQ[t_1, t_2, t_3]
+ 
+--- Define the ideal of a point configuration
+--- Starting with a simple configuration - evolution should find better ones
+--- Example: 4 points forming a square
+-pts = {
+-    ideal(x, y),           -- origin
+-    ideal(x-1, y),         -- (1,0)
+-    ideal(x, y-1),         -- (0,1)
+-    ideal(x-1, y-1)        -- (1,1)
++-- The 9 lines of the B3 arrangement in P^2
++-- x, y, z, x-y, x+y, x-z, x+z, y-z, y+z
++lines_B3 = {
++    t_1, t_2, t_3,
++    t_1 - t_2, t_1 + t_2,
++    t_1 - t_3, t_1 + t_3,
++    t_2 - t_3, t_2 + t_3
+ }
++
++-- Map to affine plane R using a generic projective transformation
++-- This prevents points from lying at infinity
++-- t_1 -> L1(x,y), t_2 -> L2(x,y), t_3 -> L3(x,y)
++affineLines = apply(lines_B3, L -> sub(L, {
++    t_1 => 3*x + 2*y + 5,
++    t_2 => 2*x + 5*y + 3,
++    t_3 => 5*x + 3*y + 2
++}))
++
++-- Find points where at least 3 lines intersect
++specialPoints = set {}
++
++-- Iterate through all triples of lines
++scan(subsets(affineLines, 3), triple -> (
++    J := ideal(triple);
++    -- Check if the 3 lines are concurrent (codimension 2 in affine plane)
++    -- If they form a triangle, codimension is 2 but J is unit ideal (degree 0)
++    -- If parallel, could be codim 1
++    if dim J == 0 then (
++        -- Saturated ideal of the point
++        pt := trim J;
++        -- Ensure it is a valid rational point (degree 1 over QQ)
++        if degree pt == 1 then (
++            specialPoints = specialPoints + {pt};
++        );
++    );
++));
++
++pts = toList specialPoints
++
++-- Fallback if something goes wrong
++if #pts == 0 then pts = {ideal(x,y)}
+ 
+ -- The ideal I is the intersection of the point ideals
+ I = intersect pts
+ -- EVOLVE-BLOCK-END

@@ -1,0 +1,37 @@
+-- Resurgence optimization: find point configurations with large resurgence
+-- The ideal I defined here will be evaluated for its resurgence properties
+--
+-- Resurgence rho(I) = sup{m/r : I^(m) not contained in I^r}
+-- For generic points, resurgence is close to 1
+-- Special configurations (Fermat points, star configurations) can have larger resurgence
+
+-- EVOLVE-BLOCK-START
+-- Define points in affine 2-space (or projective 2-space)
+-- The evolution should find point configurations with high resurgence
+
+R = QQ[x,y,z]
+
+-- Define a Star Configuration of 5 lines in P^2.
+-- The ideal consists of the 10 points of pairwise intersection of 5 generic lines.
+-- The resurgence of a star configuration of s lines is 2(s-1)/s.
+-- For s=5, resurgence is 1.6.
+-- This should cause containment failures for m/r < 1.6, e.g., I^(3) not in I^2 (1.5).
+
+-- Define 5 lines in general position (no three concurrent).
+-- We use coefficients that ensure non-vanishing determinants for all triples.
+L = {
+    x,
+    y,
+    z,
+    x + y + z,
+    x + 2*y + 3*z
+}
+
+-- Compute the 10 points as pairwise intersections of the 5 lines.
+-- apply(5, ...) creates indices 0..4.
+-- The inner loop creates pairs (i,j) with j < i.
+pts = flatten apply(5, i -> apply(i, j -> ideal(L#i, L#j)))
+
+-- The ideal I is the intersection of the point ideals
+I = intersect pts
+-- EVOLVE-BLOCK-END

@@ -1,0 +1,17 @@
+Evaluating Macaulay2 program for resurgence: results_resurgence/gen_15/main.m2
+Saving results to: results_resurgence/gen_15/results
+
+Run 1/1 completed in 0.55s
+Correctness saved to results_resurgence/gen_15/results/correct.json
+Metrics saved to results_resurgence/gen_15/results/metrics.json
+
+Evaluation failed: Validation failed: Computation failed: Failed to load /home/matt.linux/misc/shinka_fork/examples/macaulay2_example/results_resurgence/gen_15/main.m2
+
+=== Metrics ===
+Combined Score: 0.00
+
+Resurgence Lower Bound: N/A
+Containment Failures: 0
+Waldschmidt Constant: N/A
+Ideal Generators: N/A
+Ideal Dimension: N/A
